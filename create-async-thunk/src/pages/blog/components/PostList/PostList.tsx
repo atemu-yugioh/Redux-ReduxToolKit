@@ -4,9 +4,11 @@ import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from 'store'
 import { Post } from 'types/blog.type'
 import PostItem from '../PostItem'
+import SkeletonPost from '../SkeletonPost'
 
 const PostList = () => {
   const postList: Post[] = useSelector((state: RootState) => state.blog.postList)
+  const loading: boolean = useSelector((state: RootState) => state.blog.loading)
   const dispatch = useAppDispatch()
 
   // fetch list post
@@ -38,14 +40,21 @@ const PostList = () => {
           </p>
         </div>
         <div className='grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-2 xl:gap-8'>
-          {postList.map((post) => (
-            <PostItem
-              post={post}
-              key={post.id}
-              handleStartEditingPost={handleStartEditingPost}
-              handleDeletePost={handleDeletePost}
-            />
-          ))}
+          {loading && (
+            <>
+              <SkeletonPost />
+              <SkeletonPost />
+            </>
+          )}
+          {!loading &&
+            postList.map((post) => (
+              <PostItem
+                post={post}
+                key={post.id}
+                handleStartEditingPost={handleStartEditingPost}
+                handleDeletePost={handleDeletePost}
+              />
+            ))}
         </div>
       </div>
     </div>
