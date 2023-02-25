@@ -1,15 +1,20 @@
 import { useDispatch } from 'react-redux'
-import { useGetPostsQuery } from 'pages/blog/blog.service'
+import { useDeletPostMutation, useGetPostsQuery } from 'pages/blog/blog.service'
 import PostItem from '../PostItem'
 import SkeletonPost from '../SkeletonPost'
 import { startEditingPost } from 'pages/blog/blog.slice'
 
 const PostList = () => {
   const { data, isFetching } = useGetPostsQuery()
+  const [deletePost] = useDeletPostMutation()
   const dispatch = useDispatch()
 
   const handleStartEditing = (id: string) => {
     dispatch(startEditingPost(id))
+  }
+
+  const handleDeletePost = (id: string) => {
+    deletePost(id)
   }
 
   return (
@@ -29,7 +34,14 @@ const PostList = () => {
             </>
           )}
           {!isFetching &&
-            data?.map((post) => <PostItem key={post.id} post={post} handleStartEditing={handleStartEditing} />)}
+            data?.map((post) => (
+              <PostItem
+                key={post.id}
+                post={post}
+                handleStartEditing={handleStartEditing}
+                handleDeletePost={handleDeletePost}
+              />
+            ))}
         </div>
       </div>
     </div>

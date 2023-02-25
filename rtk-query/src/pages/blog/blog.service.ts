@@ -60,8 +60,29 @@ export const blogApi = createApi({
           'last-name': 'Thieng'
         }
       })
+    }),
+    updatePost: build.mutation<Post, { id: string; body: Post }>({
+      query(data) {
+        return {
+          url: `posts/${data.id}`,
+          method: 'PUT',
+          body: data.body
+        }
+      },
+      // Trong trường hợp này thì getPosts sẽ chạy lại
+      invalidatesTags: (result, error, data) => (error ? [] : [{ type: 'Posts', id: data.id }])
+    }),
+    deletPost: build.mutation<{}, string>({
+      query(id) {
+        return {
+          url: `posts/${id}`,
+          method: 'DELETE'
+        }
+      },
+      invalidatesTags: (result, error, id) => (error ? [] : [{ type: 'Posts', id: id }])
     })
   })
 })
 
-export const { useGetPostQuery, useAddPostMutation, useGetPostsQuery } = blogApi
+export const { useGetPostQuery, useAddPostMutation, useGetPostsQuery, useUpdatePostMutation, useDeletPostMutation } =
+  blogApi

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useAddPostMutation, useGetPostQuery } from 'pages/blog/blog.service'
+import { useAddPostMutation, useGetPostQuery, useUpdatePostMutation } from 'pages/blog/blog.service'
 import { RootState } from 'store'
 import { Post } from 'types/blog.type'
 import { cancelEditingPost } from 'pages/blog/blog.slice'
@@ -19,21 +19,31 @@ const CreatePost = () => {
   const postId: string = useSelector((state: RootState) => state.blog.postId)
   const dispatch = useDispatch()
 
-  const [addPost, addPostResult] = useAddPostMutation()
+  const [addPost] = useAddPostMutation()
 
-  let { data } = useGetPostQuery(postId, { skip: !postId })
+  const [updatePost] = useUpdatePostMutation()
 
-  const postData: Omit<Post, 'id'> | Post = postId && data ? data : initialState
+  let { currentData } = useGetPostQuery(postId, { skip: !postId })
 
   useEffect(() => {
-    if (postData) {
-      setFormData(postData)
+    if (currentData) {
+      setFormData(currentData)
     }
-  }, [postData])
+  }, [currentData])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    addPost(formData)
+    try {
+      if (postId) {
+        updatePost({ id: postId, body: formData as Post })
+      } else {
+        addPost(formData)
+      }
+      setFormData(initialState)
+    } catch (error) {
+      console.log(error)
+    }
+
     setFormData(initialState)
   }
 
